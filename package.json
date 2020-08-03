@@ -27,5 +27,7 @@
     "knex": "^0.21.2",
     "pg": "^8.3.0"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "jest": "^26.2.2"
+  }
 }
