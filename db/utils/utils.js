@@ -1,7 +1,7 @@
 exports.formatDates = (array) => {
-  if (array.length == 0) return [];
-  array[0].created_at = new Date(array[0].created_at);
-  return array;
+  return array.map((obj) => {
+    return { ...obj, created_at: new Date(obj.created_at) };
+  });
 };
 
 exports.makeRefObj = (array) => {};
