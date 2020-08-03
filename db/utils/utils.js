@@ -4,6 +4,14 @@ exports.formatDates = (array) => {
   });
 };
 
-exports.makeRefObj = (array) => {};
+exports.makeRefObj = (array, keyTarget, valueTarget) => {
+  const lookup = {};
+  array.forEach((obj) => {
+    lookup[obj[keyTarget]] = obj[valueTarget];
+  });
+  return lookup;
+};
 
-exports.formatComments = (comments, articleRef) => {};
+exports.formatComments = (comments, articleRef) => {
+  return [];
+};
