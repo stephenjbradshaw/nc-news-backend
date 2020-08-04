@@ -87,5 +87,30 @@ describe("/", () => {
         });
       });
     });
+    describe.only("/articles", () => {
+      describe("/:article_id", () => {
+        describe("GET", () => {
+          test("GET 200: responds with an article object", () => {
+            return request(app)
+              .get("/api/articles/1")
+              .expect(200)
+              .then(({ body: { article } }) => {
+                expect(article).toEqual(
+                  expect.objectContaining({
+                    author: expect.any(String),
+                    title: expect.any(String),
+                    article_id: expect.any(Number),
+                    body: expect.any(String),
+                    topic: expect.any(String),
+                    created_at: expect.any(String),
+                    votes: expect.any(Number),
+                    comment_count: expect.any(Number),
+                  })
+                );
+              });
+          });
+        });
+      });
+    });
   });
 });
