@@ -72,6 +72,19 @@ describe("/", () => {
               });
           });
         });
+        describe("INVALID METHODS", () => {
+          test("405: when request uses invalid method", () => {
+            const invalidMethods = ["patch", "put", "delete"];
+            const methodPromises = invalidMethods.map((method) => {
+              return request(app)
+                [method]("/api/users/:username")
+                .expect(405)
+                .then(({ body: { msg } }) => {
+                  expect(msg).toBe("Method not allowed!");
+                });
+            });
+          });
+        });
       });
     });
   });
