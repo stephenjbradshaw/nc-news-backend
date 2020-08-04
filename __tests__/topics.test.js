@@ -7,7 +7,19 @@ describe("/api/topics", () => {
   afterAll(() => knex.destroy());
   describe("GET", () => {
     test("GET 200: responds with an array of topic objects", () => {
-      return request(app).get("/api/topics").expect(200);
+      return request(app)
+        .get("/api/topics")
+        .expect(200)
+        .then(({ body: { topics } }) => {
+          topics.forEach((topic) => {
+            expect(topic).toEqual(
+              expect.objectContaining({
+                description: expect.any(String),
+                slug: expect.any(String),
+              })
+            );
+          });
+        });
     });
   });
 });

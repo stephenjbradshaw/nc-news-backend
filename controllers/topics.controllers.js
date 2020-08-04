@@ -1,6 +1,9 @@
 const { selectTopics } = require("../models/topics.models");
 
-exports.getTopics = () => {
-  console.log("in the controller");
-  selectTopics();
+exports.getTopics = (req, res, next) => {
+  selectTopics()
+    .then((topics) => {
+      res.status(200).send({ topics });
+    })
+    .catch(next);
 };
