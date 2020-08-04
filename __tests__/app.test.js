@@ -46,6 +46,33 @@ describe("/", () => {
         });
       });
     });
-    describe("/users", () => {});
+    describe("/users", () => {
+      describe("/:username", () => {
+        describe("GET", () => {
+          test("GET 200: responds with a user object", () => {
+            return request(app)
+              .get("/api/users/rogersop")
+              .expect(200)
+              .then(({ body: { user } }) => {
+                expect(user).toEqual(
+                  expect.objectContaining({
+                    username: expect.any(String),
+                    avatar_url: expect.any(String),
+                    name: expect.any(String),
+                  })
+                );
+              });
+          });
+          test("GET 404: user not found", () => {
+            return request(app)
+              .get("/api/users/notauser")
+              .expect(404)
+              .then(({ body: { msg } }) => {
+                expect(msg).toBe("User not found!");
+              });
+          });
+        });
+      });
+    });
   });
 });
