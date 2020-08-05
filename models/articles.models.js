@@ -20,26 +20,17 @@ exports.selectArticle = (article_id) => {
     });
 };
 
-exports.updateArticle = (article_id, inc_votes) => {
-  return knex
-    .select("votes")
-    .from("articles")
+exports.updateArticle = (article_id, inc_votes = 0) => {
+  return knex("articles")
     .where("article_id", "=", article_id)
+    .increment("votes", inc_votes)
+    .returning("*")
     .then((result) => {
       if (result.length === 0) {
         return Promise.reject({ status: 404, msg: "Article not found!" });
       } else {
-        const [{ votes: current_votes }] = result;
-        const updated_votes = current_votes + inc_votes;
-        return knex("articles")
-          .where("article_id", "=", article_id)
-          .update({ votes: updated_votes })
-          .returning("*");
+        [updatedArticle] = result;
+        return updatedArticle;
       }
-    })
-    .then((result) => {
-      const [updatedArticle] = result;
-      console.log(updatedArticle);
-      return updatedArticle;
     });
 };

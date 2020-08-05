@@ -144,7 +144,28 @@ describe("/", () => {
                 });
               });
           });
-          test("PATCH 400: article_id is wrong type", () => {
+          test("PATCH 200: no changes if body empty / extra keys", () => {
+            const requestBodies = [{}, { name: "mitch" }];
+            const requestPromises = requestBodies.map((requestBody) => {
+              return request(app)
+                .patch("/api/articles/1")
+                .send(requestBody)
+                .expect(200)
+                .then(({ body: { updatedArticle } }) => {
+                  expect(updatedArticle).toEqual({
+                    author: "butter_bridge",
+                    title: "Living in the shadow of a great man",
+                    article_id: 1,
+                    body: "I find this existence challenging",
+                    topic: "mitch",
+                    created_at: "2018-11-15T12:21:54.171Z",
+                    votes: 100,
+                  });
+                });
+            });
+            return Promise.all(requestPromises);
+          });
+          test("PATCH 400: invalid article_id", () => {
             return request(app)
               .patch("/api/articles/bannana")
               .send({ inc_votes: 10 })
@@ -153,39 +174,22 @@ describe("/", () => {
                 expect(msg).toBe("Bad request!");
               });
           });
-          test("PATCH 400: invalid request body", () => {
-            const invalidRequests = [
-              undefined,
-              {},
-              { foo: 6 },
-              { inc_votes: "foo" },
-            ];
-            const requestPromises = invalidRequests.map((invalidRequest) => {
-              return request(app)
-                .patch("/api/articles/1")
-                .send(invalidRequest)
-                .expect(400)
-                .then(({ body: { msg } }) => {
-                  expect(msg).toBe("Bad request!");
-                });
-            });
-            return Promise.all(requestPromises).then(() => {
-              return request(app)
-                .get("/api/articles/1")
-                .expect(200)
-                .then(({ body: { article } }) => {
-                  expect(article).toEqual({
-                    author: "butter_bridge",
-                    title: "Living in the shadow of a great man",
-                    article_id: 1,
-                    body: "I find this existence challenging",
-                    topic: "mitch",
-                    created_at: "2018-11-15T12:21:54.171Z",
-                    votes: 100,
-                    comment_count: 13,
+          test("PATCH 400: invalid inc_votes", () => {
+            return request(app)
+              .patch("/api/articles/1")
+              .send({ inc_votes: "bannana" })
+              .expect(400)
+              .then(({ body: { msg } }) => {
+                expect(msg).toBe("Bad request!");
+              })
+              .then(() => {
+                return request(app)
+                  .get("/api/articles/1")
+                  .expect(200)
+                  .then(({ body: { article } }) => {
+                    expect(article.votes).toEqual(100);
                   });
-                });
-            });
+              });
           });
           test("PATCH 404: article_id not found", () => {
             return request(app)
@@ -197,30 +201,30 @@ describe("/", () => {
               });
           });
         });
-        describe("INVALID METHODS", () => {
-          test("405: when request uses invalid method", () => {
-            const invalidMethods = ["put", "post", "delete"];
-            const methodPromises = invalidMethods.map((method) => {
-              return request(app)
-                [method]("/api/articles/:article_id")
-                .expect(405)
-                .then(({ body: { msg } }) => {
-                  expect(msg).toBe("Method not allowed!");
-                });
-            });
-            return Promise.all(methodPromises);
+      });
+      describe("INVALID METHODS", () => {
+        test("405: when request uses invalid method", () => {
+          const invalidMethods = ["put", "post", "delete"];
+          const methodPromises = invalidMethods.map((method) => {
+            return request(app)
+              [method]("/api/articles/:article_id")
+              .expect(405)
+              .then(({ body: { msg } }) => {
+                expect(msg).toBe("Method not allowed!");
+              });
           });
+          return Promise.all(methodPromises);
         });
       });
-      describe.skip("/comments", () => {
-        describe("POST", () => {
-          test("POST 201: responds with the posted comment", () => {
-            // Incomplete test
-            return request(app)
-              .post("/api/articles/:article_id/comments")
-              .send({ username: "butter_bridge", body: "a new comment" })
-              .expect(201);
-          });
+    });
+    describe.skip("/comments", () => {
+      describe("POST", () => {
+        test("POST 201: responds with the posted comment", () => {
+          // Incomplete test
+          return request(app)
+            .post("/api/articles/:article_id/comments")
+            .send({ username: "butter_bridge", body: "a new comment" })
+            .expect(201);
         });
       });
     });
