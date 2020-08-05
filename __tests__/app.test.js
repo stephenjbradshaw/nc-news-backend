@@ -34,7 +34,7 @@ describe("/", () => {
       });
       describe("INVALID METHODS", () => {
         test("405: when request uses invalid method", () => {
-          const invalidMethods = ["patch", "put", "delete"];
+          const invalidMethods = ["patch", "put", "post", "delete"];
           const methodPromises = invalidMethods.map((method) => {
             return request(app)
               [method]("/api/topics")
@@ -43,6 +43,7 @@ describe("/", () => {
                 expect(msg).toBe("Method not allowed!");
               });
           });
+          return Promise.all(methodPromises);
         });
       });
     });
@@ -74,7 +75,7 @@ describe("/", () => {
         });
         describe("INVALID METHODS", () => {
           test("405: when request uses invalid method", () => {
-            const invalidMethods = ["patch", "put", "delete"];
+            const invalidMethods = ["patch", "put", "post", "delete"];
             const methodPromises = invalidMethods.map((method) => {
               return request(app)
                 [method]("/api/users/:username")
@@ -83,11 +84,12 @@ describe("/", () => {
                   expect(msg).toBe("Method not allowed!");
                 });
             });
+            return Promise.all(methodPromises);
           });
         });
       });
     });
-    describe.only("/articles", () => {
+    describe("/articles", () => {
       describe("/:article_id", () => {
         describe("GET", () => {
           test("GET 200: responds with an article object", () => {
