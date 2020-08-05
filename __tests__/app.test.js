@@ -212,6 +212,17 @@ describe("/", () => {
           });
         });
       });
+      describe.skip("/comments", () => {
+        describe("POST", () => {
+          test("POST 201: responds with the posted comment", () => {
+            // Incomplete test
+            return request(app)
+              .post("/api/articles/:article_id/comments")
+              .send({ username: "butter_bridge", body: "a new comment" })
+              .expect(201);
+          });
+        });
+      });
     });
   });
 });
