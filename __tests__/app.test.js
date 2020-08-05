@@ -5,7 +5,7 @@ const knex = require("../db/connection");
 describe("/", () => {
   beforeEach(() => knex.seed.run());
   afterAll(() => knex.destroy());
-  test("GET all 404: Route does not exist", () => {
+  test("ALL 404: Route does not exist", () => {
     return request(app)
       .get("/notARoute")
       .expect(404)
@@ -142,6 +142,58 @@ describe("/", () => {
                   created_at: "2018-11-15T12:21:54.171Z",
                   votes: 110,
                 });
+              });
+          });
+          test("PATCH 400: article_id is wrong type", () => {
+            return request(app)
+              .patch("/api/articles/bannana")
+              .send({ inc_votes: 10 })
+              .expect(400)
+              .then(({ body: { msg } }) => {
+                expect(msg).toBe("Bad request!");
+              });
+          });
+          test("PATCH 400: invalid request body", () => {
+            const invalidRequests = [
+              undefined,
+              {},
+              { foo: 6 },
+              { inc_votes: "foo" },
+            ];
+            const requestPromises = invalidRequests.map((invalidRequest) => {
+              return request(app)
+                .patch("/api/articles/1")
+                .send(invalidRequest)
+                .expect(400)
+                .then(({ body: { msg } }) => {
+                  expect(msg).toBe("Bad request!");
+                });
+            });
+            return Promise.all(requestPromises).then(() => {
+              return request(app)
+                .get("/api/articles/1")
+                .expect(200)
+                .then(({ body: { article } }) => {
+                  expect(article).toEqual({
+                    author: "butter_bridge",
+                    title: "Living in the shadow of a great man",
+                    article_id: 1,
+                    body: "I find this existence challenging",
+                    topic: "mitch",
+                    created_at: "2018-11-15T12:21:54.171Z",
+                    votes: 100,
+                    comment_count: 13,
+                  });
+                });
+            });
+          });
+          test("PATCH 404: article_id not found", () => {
+            return request(app)
+              .patch("/api/articles/999999")
+              .send({ inc_votes: 10 })
+              .expect(404)
+              .then(({ body: { msg } }) => {
+                expect(msg).toBe("Article not found!");
               });
           });
         });
