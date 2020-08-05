@@ -9,9 +9,13 @@ exports.selectArticle = (article_id) => {
     .where("articles.article_id", "=", article_id)
     .groupBy("articles.article_id")
     .then((result) => {
-      const [article] = result;
-      article.comment_count = parseInt(article.comment_count, 10);
-      article.created_at = article.created_at.toISOString();
-      return article;
+      if (result.length === 0) {
+        return Promise.reject({ status: 404, msg: "Article not found!" });
+      } else {
+        const [article] = result;
+        article.comment_count = parseInt(article.comment_count, 10);
+        article.created_at = article.created_at.toISOString();
+        return article;
+      }
     });
 };

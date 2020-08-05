@@ -64,7 +64,7 @@ describe("/", () => {
                 );
               });
           });
-          test("GET 404: user not found", () => {
+          test("GET 404: username not found", () => {
             return request(app)
               .get("/api/users/notauser")
               .expect(404)
@@ -110,6 +110,36 @@ describe("/", () => {
                   })
                 );
               });
+          });
+          test("GET 400: article_id is wrong type", () => {
+            return request(app)
+              .get("/api/articles/bannana")
+              .expect(400)
+              .then(({ body: { msg } }) => {
+                expect(msg).toBe("Bad request!");
+              });
+          });
+          test("GET 404: article_id not found", () => {
+            return request(app)
+              .get("/api/articles/999999")
+              .expect(404)
+              .then(({ body: { msg } }) => {
+                expect(msg).toBe("Article not found!");
+              });
+          });
+        });
+        describe("INVALID METHODS", () => {
+          test("405: when request uses invalid method", () => {
+            const invalidMethods = ["patch", "put", "post", "delete"];
+            const methodPromises = invalidMethods.map((method) => {
+              return request(app)
+                [method]("/api/articles/:article_id")
+                .expect(405)
+                .then(({ body: { msg } }) => {
+                  expect(msg).toBe("Method not allowed!");
+                });
+            });
+            return Promise.all(methodPromises);
           });
         });
       });
