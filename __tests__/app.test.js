@@ -97,18 +97,16 @@ describe("/", () => {
               .get("/api/articles/1")
               .expect(200)
               .then(({ body: { article } }) => {
-                expect(article).toEqual(
-                  expect.objectContaining({
-                    author: expect.any(String),
-                    title: expect.any(String),
-                    article_id: expect.any(Number),
-                    body: expect.any(String),
-                    topic: expect.any(String),
-                    created_at: expect.any(String),
-                    votes: expect.any(Number),
-                    comment_count: expect.any(Number),
-                  })
-                );
+                expect(article).toEqual({
+                  author: "butter_bridge",
+                  title: "Living in the shadow of a great man",
+                  article_id: 1,
+                  body: "I find this existence challenging",
+                  topic: "mitch",
+                  created_at: "2018-11-15T12:21:54.171Z",
+                  votes: 100,
+                  comment_count: 13,
+                });
               });
           });
           test("GET 400: article_id is wrong type", () => {
@@ -128,9 +126,28 @@ describe("/", () => {
               });
           });
         });
+        describe("PATCH", () => {
+          test("PATCH 200: responds with the updated article", () => {
+            return request(app)
+              .patch("/api/articles/1")
+              .send({ inc_votes: 10 })
+              .expect(200)
+              .then(({ body: { updatedArticle } }) => {
+                expect(updatedArticle).toEqual({
+                  author: "butter_bridge",
+                  title: "Living in the shadow of a great man",
+                  article_id: 1,
+                  body: "I find this existence challenging",
+                  topic: "mitch",
+                  created_at: "2018-11-15T12:21:54.171Z",
+                  votes: 110,
+                });
+              });
+          });
+        });
         describe("INVALID METHODS", () => {
           test("405: when request uses invalid method", () => {
-            const invalidMethods = ["patch", "put", "post", "delete"];
+            const invalidMethods = ["put", "post", "delete"];
             const methodPromises = invalidMethods.map((method) => {
               return request(app)
                 [method]("/api/articles/:article_id")

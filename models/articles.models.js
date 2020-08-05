@@ -19,3 +19,24 @@ exports.selectArticle = (article_id) => {
       }
     });
 };
+
+exports.updateArticle = (article_id, inc_votes) => {
+  return knex
+    .select("votes")
+    .from("articles")
+    .where("article_id", "=", article_id)
+    .then(([{ votes: current_votes }]) => {
+      return current_votes;
+    })
+    .then((current_votes) => {
+      const updated_votes = current_votes + inc_votes;
+      return knex("articles")
+        .where("article_id", "=", article_id)
+        .update({ votes: updated_votes })
+        .returning("*");
+    })
+    .then((result) => {
+      const [updatedArticle] = result;
+      return updatedArticle;
+    });
+};
