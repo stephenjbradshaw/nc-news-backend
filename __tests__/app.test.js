@@ -519,5 +519,43 @@ describe("/", () => {
         });
       });
     });
+    describe("/comments", () => {
+      describe("/:comment_id", () => {
+        describe.only("PATCH", () => {
+          test("PATCH 200: responds with the updated article", () => {
+            return request(app)
+              .patch("/api/comments/1")
+              .send({ inc_votes: 1 })
+              .expect(200)
+              .then(({ body: { updatedComment } }) => {
+                console.log(updatedComment);
+                expect(updatedComment).toEqual({
+                  comment_id: 1,
+                  body:
+                    "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+                  article_id: 9,
+                  author: "butter_bridge",
+                  votes: 17,
+                  created_at: "2017-11-22T12:36:03.389Z",
+                });
+              });
+          });
+        });
+        describe("INVALID METHODS", () => {
+          test("405: when request uses invalid method", () => {
+            const invalidMethods = ["put", "get", "post", "delete"];
+            const methodPromises = invalidMethods.map((method) => {
+              return request(app)
+                [method]("/api/comments/1")
+                .expect(405)
+                .then(({ body: { msg } }) => {
+                  expect(msg).toBe("Method not allowed!");
+                });
+            });
+            return Promise.all(methodPromises);
+          });
+        });
+      });
+    });
   });
 });
