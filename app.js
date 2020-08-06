@@ -1,7 +1,8 @@
 const express = require("express");
 const apiRouter = require("./routers/api.router");
 const {
-  handlePSQLErrors,
+  handlePSQL400Errors,
+  handlePSQL404Errors,
   handleCustomErrors,
   handle500s,
 } = require("./errors/");
@@ -15,7 +16,8 @@ app.all("/*", (req, res, next) =>
   res.status(404).send({ msg: "Route not found!" })
 );
 
-app.use(handlePSQLErrors);
+app.use(handlePSQL400Errors);
+app.use(handlePSQL404Errors);
 app.use(handleCustomErrors);
 app.use(handle500s);
 

@@ -1,9 +1,16 @@
 // Error-handling middleware
-exports.handlePSQLErrors = (err, req, res, next) => {
+exports.handlePSQL400Errors = (err, req, res, next) => {
   console.log(err, "<== log of ANY error caught by a catch block");
-  const psqlCodes = ["22P02"];
+  const psqlCodes = ["22P02", "23502", "42703"];
   if (psqlCodes.includes(err.code)) {
     res.status(400).send({ msg: "Bad request!" });
+  } else next(err);
+};
+
+exports.handlePSQL404Errors = (err, req, res, next) => {
+  const psqlCodes = ["23503"];
+  if (psqlCodes.includes(err.code)) {
+    res.status(404).send({ msg: "Value not found!" });
   } else next(err);
 };
 
@@ -14,7 +21,6 @@ exports.handleCustomErrors = (err, req, res, next) => {
 };
 
 exports.handle500s = (err, req, res, next) => {
-  console.log(err);
   res.status(500).send({ msg: "Internal server error!" });
 };
 
