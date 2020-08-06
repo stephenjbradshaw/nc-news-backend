@@ -1,6 +1,21 @@
 const knex = require("../db/connection");
 
-exports.selectArticle = (article_id) => {
+exports.selectArticles = () => {
+  return knex
+    .select("articles.*")
+    .from("articles")
+    .count({ comment_count: "comments.comment_id" })
+    .leftJoin("comments", "comments.article_id", "articles.article_id")
+    .groupBy("articles.article_id")
+    .then((articles) => {
+      return articles.map((article) => {
+        article.comment_count = parseInt(article.comment_count, 10);
+        return article;
+      });
+    });
+};
+
+exports.selectArticleById = (article_id) => {
   return knex
     .select("articles.*")
     .from("articles")
@@ -14,13 +29,13 @@ exports.selectArticle = (article_id) => {
       } else {
         const [article] = result;
         article.comment_count = parseInt(article.comment_count, 10);
-        article.created_at = article.created_at.toISOString();
+
         return article;
       }
     });
 };
 
-exports.updateArticle = (article_id, inc_votes = 0) => {
+exports.updateArticleById = (article_id, inc_votes = 0) => {
   return knex("articles")
     .where("article_id", "=", article_id)
     .increment("votes", inc_votes)
@@ -35,7 +50,7 @@ exports.updateArticle = (article_id, inc_votes = 0) => {
     });
 };
 
-exports.selectComments = (
+exports.selectCommentsByArticleId = (
   article_id,
   sort_by = "created_at",
   order = "desc"
@@ -57,7 +72,7 @@ exports.selectComments = (
   );
 };
 
-exports.insertComment = (article_id, author, body) => {
+exports.insertCommentByArticleId = (article_id, author, body) => {
   return knex("comments")
     .insert({ article_id: article_id, author: author, body: body })
     .returning("*")
