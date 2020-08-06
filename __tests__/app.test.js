@@ -91,11 +91,14 @@ describe("/", () => {
     });
     describe("/articles", () => {
       describe("GET", () => {
-        test("GET 200: responds with an array of article objects", () => {
+        // Base functionality
+        test("GET 200: responds with an array of article objects, default sort", () => {
           return request(app)
             .get("/api/articles")
             .expect(200)
             .then(({ body: { articles } }) => {
+              expect(articles.length).toBe(12);
+              expect(articles).toBeSortedBy("created_at", { descending: true });
               articles.forEach((article) => {
                 expect(article).toEqual(
                   expect.objectContaining({
@@ -109,6 +112,107 @@ describe("/", () => {
                   })
                 );
               });
+            });
+        });
+
+        // Sort queries
+        test("GET 200: custom sort column, defaults to descending if order not specified", () => {
+          return request(app)
+            .get("/api/articles?sort_by=author")
+            .expect(200)
+            .then(({ body: { articles } }) => {
+              expect(articles.length).toBe(12);
+              expect(articles).toBeSortedBy("author", { descending: true });
+            });
+        });
+        test("GET 200: custom sort column, defaults to descending if invalid order", () => {
+          return request(app)
+            .get("/api/articles?sort_by=author&order=bannana")
+            .expect(200)
+            .then(({ body: { articles } }) => {
+              expect(articles.length).toBe(12);
+              expect(articles).toBeSortedBy("author", { descending: true });
+            });
+        });
+        test("GET 200: custom sort column, custom order", () => {
+          return request(app)
+            .get("/api/articles?sort_by=title&order=asc")
+            .expect(200)
+            .then(({ body: { articles } }) => {
+              expect(articles.length).toBe(12);
+              expect(articles).toBeSortedBy("title", { descending: false });
+            });
+        });
+        test("GET 200: responds with default sort if invalid query", () => {
+          return request(app)
+            .get("/api/articles?apple=bannana")
+            .expect(200)
+            .then(({ body: { articles } }) => {
+              expect(articles.length).toBe(12);
+              expect(articles).toBeSortedBy("created_at", {
+                descending: true,
+              });
+            });
+        });
+        test("GET 400: specified sort column does not exist", () => {
+          return request(app)
+            .get("/api/articles?sort_by=bannana")
+            .expect(400)
+            .then(({ body: { msg } }) => {
+              expect(msg).toBe("Bad request!");
+            });
+        });
+
+        // Filter queries
+        test("GET 200: can filter by author", () => {
+          return request(app)
+            .get("/api/articles/?author=rogersop")
+            .expect(200)
+            .then(({ body: { articles } }) => {
+              expect(articles.length).toBe(3);
+              articles.forEach((article) => {
+                expect(article.author).toBe("rogersop");
+              });
+            });
+        });
+        test("GET 200: can filter by topic", () => {
+          return request(app)
+            .get("/api/articles/?topic=mitch")
+            .expect(200)
+            .then(({ body: { articles } }) => {
+              expect(articles.length).toBe(11);
+              articles.forEach((article) => {
+                expect(article.topic).toBe("mitch");
+              });
+            });
+        });
+        test("GET 200: can filter by topic AND author", () => {
+          return request(app)
+            .get("/api/articles?author=rogersop&topic=mitch")
+            .expect(200)
+            .then(({ body: { articles } }) => {
+              expect(articles.length).toBe(2);
+              articles.forEach((article) => {
+                expect(article.author).toBe("rogersop");
+                expect(article.topic).toBe("mitch");
+              });
+            });
+        });
+        // N.b. was unsure whether to go with 404 or 200 for this text and next
+        test("GET 404: no results after filtering (but author / topic does exist", () => {
+          return request(app)
+            .get("/api/articles?author=lurker")
+            .expect(404)
+            .then(({ body: { msg } }) => {
+              expect(msg).toBe("No articles found!");
+            });
+        });
+        test("GET 404: no results after filtering (and author / topic does not exist)", () => {
+          return request(app)
+            .get("/api/articles?topic=badger")
+            .expect(404)
+            .then(({ body: { msg } }) => {
+              expect(msg).toBe("No articles found!");
             });
         });
       });
