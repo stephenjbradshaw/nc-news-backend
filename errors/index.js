@@ -1,6 +1,5 @@
 // Error-handling middleware
 exports.handlePSQL400Errors = (err, req, res, next) => {
-  console.log(err, "<== log of ANY error caught by a catch block");
   const psqlCodes = ["22P02", "23502", "42703"];
   if (psqlCodes.includes(err.code)) {
     res.status(400).send({ msg: "Bad request!" });
