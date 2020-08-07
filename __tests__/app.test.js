@@ -521,14 +521,13 @@ describe("/", () => {
     });
     describe("/comments", () => {
       describe("/:comment_id", () => {
-        describe.only("PATCH", () => {
-          test("PATCH 200: responds with the updated article", () => {
+        describe("PATCH", () => {
+          test("PATCH 200: responds with the updated comment", () => {
             return request(app)
               .patch("/api/comments/1")
               .send({ inc_votes: 1 })
               .expect(200)
               .then(({ body: { updatedComment } }) => {
-                console.log(updatedComment);
                 expect(updatedComment).toEqual({
                   comment_id: 1,
                   body:
@@ -538,6 +537,71 @@ describe("/", () => {
                   votes: 17,
                   created_at: "2017-11-22T12:36:03.389Z",
                 });
+              });
+          });
+          test("PATCH 200: updates if extra key on body", () => {
+            return request(app)
+              .patch("/api/comments/1")
+              .send({ inc_votes: 1, name: "mitch" })
+              .expect(200)
+              .then(({ body: { updatedComment } }) => {
+                expect(updatedComment).toEqual({
+                  comment_id: 1,
+                  body:
+                    "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+                  article_id: 9,
+                  author: "butter_bridge",
+                  votes: 17,
+                  created_at: "2017-11-22T12:36:03.389Z",
+                });
+              });
+          });
+          test("PATCH 200: no changes if body empty / wrong key", () => {
+            const requestBodies = [{}, { name: "mitch" }];
+            const requestPromises = requestBodies.map((requestBody) => {
+              return request(app)
+                .patch("/api/comments/1")
+                .send(requestBody)
+                .expect(200)
+                .then(({ body: { updatedComment } }) => {
+                  expect(updatedComment).toEqual({
+                    comment_id: 1,
+                    body:
+                      "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+                    article_id: 9,
+                    author: "butter_bridge",
+                    votes: 16,
+                    created_at: "2017-11-22T12:36:03.389Z",
+                  });
+                });
+            });
+            return Promise.all(requestPromises);
+          });
+          test("PATCH 400: invalid comment_id", () => {
+            return request(app)
+              .patch("/api/comments/badger")
+              .send({ inc_votes: 10 })
+              .expect(400)
+              .then(({ body: { msg } }) => {
+                expect(msg).toBe("Bad request!");
+              });
+          });
+          test("PATCH 400: invalid inc_votes value", () => {
+            return request(app)
+              .patch("/api/comments/1")
+              .send({ inc_votes: "bannana" })
+              .expect(400)
+              .then(({ body: { msg } }) => {
+                expect(msg).toBe("Bad request!");
+              });
+          });
+          test("PATCH 404: comment_id not found", () => {
+            return request(app)
+              .patch("/api/comments/999999")
+              .send({ inc_votes: 10 })
+              .expect(404)
+              .then(({ body: { msg } }) => {
+                expect(msg).toBe("Comment not found!");
               });
           });
         });
