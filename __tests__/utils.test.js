@@ -218,6 +218,17 @@ describe("formatComments", () => {
     expect(formatComments([])).toEqual([]);
   });
   test("returns a single-object array with renamed created_by key when passed a single-object array", () => {
+    const article = [
+      {
+        article_id: 9,
+        title: "They're not exactly dogs, are they?",
+        topic: "mitch",
+        author: "butter_bridge",
+        body: "Well? Think about it.",
+        created_at: 533132514171,
+      },
+    ];
+    const lookup = makeRefObj(article, "title", "article_id");
     const comment = [
       {
         body:
@@ -228,7 +239,7 @@ describe("formatComments", () => {
         created_at: 1511354163389,
       },
     ];
-    const formattedComment = formatComments(comment);
+    const formattedComment = formatComments(comment, lookup);
     expect(formattedComment[0]).toHaveProperty("author", "butter_bridge");
     expect(formattedComment[0]).not.toHaveProperty("created_by");
   });
