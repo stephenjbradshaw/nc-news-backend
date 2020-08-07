@@ -4,9 +4,12 @@ const {
   getArticles,
   getArticleById,
   patchArticleById,
+} = require("../controllers/articles.controllers");
+
+const {
   getCommentsByArticleId,
   postCommentByArticleId,
-} = require("../controllers/articles.controllers");
+} = require("../controllers/comments.controllers");
 
 const { handle405s } = require("../errors/");
 
