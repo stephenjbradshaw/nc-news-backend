@@ -1,6 +1,6 @@
 const knex = require("../db/connection");
 
-exports.selectUser = (username) => {
+exports.selectUserByUsername = (username) => {
   return knex
     .select("*")
     .from("users")

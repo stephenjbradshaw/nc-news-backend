@@ -46,6 +46,43 @@ describe("/", () => {
           return Promise.all(methodPromises);
         });
       });
+      describe("/:slug", () => {
+        describe("GET", () => {
+          test("GET 200: responds with a topic object", () => {
+            return request(app)
+              .get("/api/topics/mitch")
+              .expect(200)
+              .then(({ body: { topic } }) => {
+                expect(topic).toEqual({
+                  description: "The man, the Mitch, the legend",
+                  slug: "mitch",
+                });
+              });
+          });
+          test("GET 404: topic not found", () => {
+            return request(app)
+              .get("/api/topics/notATopic")
+              .expect(404)
+              .then(({ body: { msg } }) => {
+                expect(msg).toBe("Topic not found!");
+              });
+          });
+        });
+        describe("INVALID METHODS", () => {
+          test("405: when request uses invalid method", () => {
+            const invalidMethods = ["put", "post", "patch", "delete"];
+            const methodPromises = invalidMethods.map((method) => {
+              return request(app)
+                [method]("/api/topics/mitch")
+                .expect(405)
+                .then(({ body: { msg } }) => {
+                  expect(msg).toBe("Method not allowed!");
+                });
+            });
+            return Promise.all(methodPromises);
+          });
+        });
+      });
     });
     describe("/users", () => {
       describe("/:username", () => {
@@ -125,13 +162,12 @@ describe("/", () => {
               expect(articles).toBeSortedBy("author", { descending: true });
             });
         });
-        test("GET 200: custom sort column, defaults to descending if invalid order", () => {
+        test("GET 400: invalid sort order", () => {
           return request(app)
             .get("/api/articles?sort_by=author&order=bannana")
-            .expect(200)
-            .then(({ body: { articles } }) => {
-              expect(articles.length).toBe(12);
-              expect(articles).toBeSortedBy("author", { descending: true });
+            .expect(400)
+            .then(({ body: { msg } }) => {
+              expect(msg).toBe("Bad request!");
             });
         });
         test("GET 200: custom sort column, custom order", () => {
@@ -404,13 +440,12 @@ describe("/", () => {
                   expect(comments).toBeSortedBy("author", { descending: true });
                 });
             });
-            test("GET 200: custom sort column, defaults to descending if invalid order", () => {
+            test("GET 400: invalid sort order", () => {
               return request(app)
                 .get("/api/articles/1/comments?sort_by=votes&order=bannana")
-                .expect(200)
-                .then(({ body: { comments } }) => {
-                  expect(comments.length).toBe(13);
-                  expect(comments).toBeSortedBy("votes", { descending: true });
+                .expect(400)
+                .then(({ body: { msg } }) => {
+                  expect(msg).toBe("Bad request!");
                 });
             });
             test("GET 200: custom sort column, custom order", () => {

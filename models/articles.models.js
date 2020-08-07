@@ -6,30 +6,30 @@ exports.selectArticles = (
   author,
   topic
 ) => {
-  if (order !== "asc" && order !== "desc") order = "desc";
-  return knex
-    .select("articles.*")
-    .from("articles")
-    .count({ comment_count: "comments.comment_id" })
-    .leftJoin("comments", "comments.article_id", "articles.article_id")
-    .groupBy("articles.article_id")
-    .orderBy(sort_by, order)
-    .modify((query) => {
-      if (author !== undefined && topic !== undefined) {
-        query.where({ "articles.author": author, "articles.topic": topic });
-      } else if (author !== undefined)
-        query.where("articles.author", "=", author);
-      else if (topic !== undefined) query.where("articles.topic", "=", topic);
-    })
-    .then((articles) => {
-      if (articles.length === 0) {
-        return Promise.reject({ status: 404, msg: "No articles found!" });
-      } else
-        return articles.map((article) => {
-          article.comment_count = parseInt(article.comment_count, 10);
-          return article;
-        });
-    });
+  if (order !== "asc" && order !== "desc") {
+    return Promise.reject({ status: 400, msg: "Bad request!" });
+  } else {
+    return knex
+      .select("articles.*")
+      .from("articles")
+      .count({ comment_count: "comments.comment_id" })
+      .leftJoin("comments", "comments.article_id", "articles.article_id")
+      .groupBy("articles.article_id")
+      .orderBy(sort_by, order)
+      .modify((query) => {
+        if (author) query.where("articles.author", "=", author);
+        if (topic) query.where("articles.topic", "=", topic);
+      })
+      .then((articles) => {
+        if (articles.length === 0) {
+          return Promise.reject({ status: 404, msg: "No articles found!" });
+        } else
+          return articles.map((article) => {
+            article.comment_count = parseInt(article.comment_count, 10);
+            return article;
+          });
+      });
+  }
 };
 
 exports.selectArticleById = (article_id) => {

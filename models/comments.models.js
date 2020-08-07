@@ -5,21 +5,27 @@ exports.selectCommentsByArticleId = (
   sort_by = "created_at",
   order = "desc"
 ) => {
-  if (order !== "asc" && order !== "desc") order = "desc";
+  if (order !== "asc" && order !== "desc") {
+    return Promise.reject({ status: 400, msg: "Bad request!" });
+  } else {
+    const articlesPromise = knex("articles").where(
+      "article_id",
+      "=",
+      article_id
+    );
 
-  const articlesPromise = knex("articles").where("article_id", "=", article_id);
+    const commentsPromise = knex("comments")
+      .where("article_id", "=", article_id)
+      .orderBy(sort_by, order);
 
-  const commentsPromise = knex("comments")
-    .where("article_id", "=", article_id)
-    .orderBy(sort_by, order);
-
-  return Promise.all([articlesPromise, commentsPromise]).then(
-    ([articles, comments]) => {
-      if (articles.length === 0) {
-        return Promise.reject({ status: 404, msg: "Article not found!" });
-      } else return comments;
-    }
-  );
+    return Promise.all([articlesPromise, commentsPromise]).then(
+      ([articles, comments]) => {
+        if (articles.length === 0) {
+          return Promise.reject({ status: 404, msg: "Article not found!" });
+        } else return comments;
+      }
+    );
+  }
 };
 
 exports.insertCommentByArticleId = (article_id, author, body) => {
