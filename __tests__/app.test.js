@@ -521,6 +521,42 @@ describe("/", () => {
     });
     describe("/comments", () => {
       describe("/:comment_id", () => {
+        describe("GET", () => {
+          test("GET 200: Responds with a comment object", () => {
+            return request(app)
+              .get("/api/comments/1")
+              .expect(200)
+              .then(({ body: { comment } }) => {
+                expect(comment).toEqual(
+                  expect.objectContaining({
+                    comment_id: 1,
+                    body:
+                      "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+                    article_id: 9,
+                    author: "butter_bridge",
+                    votes: 16,
+                    created_at: "2017-11-22T12:36:03.389Z",
+                  })
+                );
+              });
+          });
+          test("GET 400: invalid comment_id", () => {
+            return request(app)
+              .get("/api/comments/bannana")
+              .expect(400)
+              .then(({ body: { msg } }) => {
+                expect(msg).toBe("Bad request!");
+              });
+          });
+          test("GET 404: comment_id not found", () => {
+            return request(app)
+              .get("/api/comments/999999")
+              .expect(404)
+              .then(({ body: { msg } }) => {
+                expect(msg).toBe("Comment not found!");
+              });
+          });
+        });
         describe("PATCH", () => {
           test("PATCH 200: responds with the updated comment", () => {
             return request(app)
@@ -593,6 +629,14 @@ describe("/", () => {
               .expect(400)
               .then(({ body: { msg } }) => {
                 expect(msg).toBe("Bad request!");
+              })
+              .then(() => {
+                return request(app)
+                  .get("/api/comments/1")
+                  .expect(200)
+                  .then(({ body: { comment } }) => {
+                    expect(comment.votes).toEqual(16);
+                  });
               });
           });
           test("PATCH 404: comment_id not found", () => {
@@ -605,9 +649,40 @@ describe("/", () => {
               });
           });
         });
+        describe("DELETE", () => {
+          test("DELETE 204: comment deleted", () => {
+            return request(app)
+              .delete("/api/comments/1")
+              .expect(204)
+              .then(() => {
+                return request(app)
+                  .get("/api/comments/1")
+                  .expect(404)
+                  .then(({ body: { msg } }) => {
+                    expect(msg).toBe("Comment not found!");
+                  });
+              });
+          });
+          test("DELETE 400: invalid comment_id", () => {
+            return request(app)
+              .delete("/api/comments/bannana")
+              .expect(400)
+              .then(({ body: { msg } }) => {
+                expect(msg).toBe("Bad request!");
+              });
+          });
+          test("DELETE 404: comment_id not found", () => {
+            return request(app)
+              .delete("/api/comments/999999")
+              .expect(404)
+              .then(({ body: { msg } }) => {
+                expect(msg).toBe("Comment not found!");
+              });
+          });
+        });
         describe("INVALID METHODS", () => {
           test("405: when request uses invalid method", () => {
-            const invalidMethods = ["put", "get", "post", "delete"];
+            const invalidMethods = ["put", "post"];
             const methodPromises = invalidMethods.map((method) => {
               return request(app)
                 [method]("/api/comments/1")
