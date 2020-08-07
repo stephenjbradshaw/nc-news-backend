@@ -272,8 +272,8 @@ describe("/", () => {
               .patch("/api/articles/1")
               .send({ inc_votes: 10 })
               .expect(200)
-              .then(({ body: { updatedArticle } }) => {
-                expect(updatedArticle).toEqual({
+              .then(({ body: { article } }) => {
+                expect(article).toEqual({
                   author: "butter_bridge",
                   title: "Living in the shadow of a great man",
                   article_id: 1,
@@ -289,8 +289,8 @@ describe("/", () => {
               .patch("/api/articles/1")
               .send({ inc_votes: 10, name: "mitch" })
               .expect(200)
-              .then(({ body: { updatedArticle } }) => {
-                expect(updatedArticle).toEqual({
+              .then(({ body: { article } }) => {
+                expect(article).toEqual({
                   author: "butter_bridge",
                   title: "Living in the shadow of a great man",
                   article_id: 1,
@@ -308,8 +308,8 @@ describe("/", () => {
                 .patch("/api/articles/1")
                 .send(requestBody)
                 .expect(200)
-                .then(({ body: { updatedArticle } }) => {
-                  expect(updatedArticle).toEqual({
+                .then(({ body: { article } }) => {
+                  expect(article).toEqual({
                     author: "butter_bridge",
                     title: "Living in the shadow of a great man",
                     article_id: 1,
@@ -472,8 +472,8 @@ describe("/", () => {
                 .post("/api/articles/1/comments")
                 .send({ username: "butter_bridge", body: "a new comment" })
                 .expect(201)
-                .then(({ body: { insertedComment } }) => {
-                  expect(insertedComment).toEqual({
+                .then(({ body: { comment } }) => {
+                  expect(comment).toEqual({
                     article_id: 1,
                     author: "butter_bridge",
                     body: "a new comment",
@@ -563,8 +563,8 @@ describe("/", () => {
               .patch("/api/comments/1")
               .send({ inc_votes: 1 })
               .expect(200)
-              .then(({ body: { updatedComment } }) => {
-                expect(updatedComment).toEqual({
+              .then(({ body: { comment } }) => {
+                expect(comment).toEqual({
                   comment_id: 1,
                   body:
                     "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
@@ -580,8 +580,8 @@ describe("/", () => {
               .patch("/api/comments/1")
               .send({ inc_votes: 1, name: "mitch" })
               .expect(200)
-              .then(({ body: { updatedComment } }) => {
-                expect(updatedComment).toEqual({
+              .then(({ body: { comment } }) => {
+                expect(comment).toEqual({
                   comment_id: 1,
                   body:
                     "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
@@ -599,8 +599,8 @@ describe("/", () => {
                 .patch("/api/comments/1")
                 .send(requestBody)
                 .expect(200)
-                .then(({ body: { updatedComment } }) => {
-                  expect(updatedComment).toEqual({
+                .then(({ body: { comment } }) => {
+                  expect(comment).toEqual({
                     comment_id: 1,
                     body:
                       "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",

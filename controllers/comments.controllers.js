@@ -20,8 +20,8 @@ exports.postCommentByArticleId = (req, res, next) => {
   const { article_id } = req.params;
   const { username: author, body } = req.body;
   insertCommentByArticleId(article_id, author, body)
-    .then((insertedComment) => {
-      res.status(201).send({ insertedComment });
+    .then((comment) => {
+      res.status(201).send({ comment });
     })
     .catch(next);
 };
@@ -39,8 +39,8 @@ exports.patchCommentById = (req, res, next) => {
   const { comment_id } = req.params;
   const { inc_votes } = req.body;
   updateCommentById(comment_id, inc_votes)
-    .then((updatedComment) => {
-      res.status(200).send({ updatedComment });
+    .then((comment) => {
+      res.status(200).send({ comment });
     })
     .catch(next);
 };
