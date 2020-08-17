@@ -234,21 +234,36 @@ describe("/", () => {
               });
             });
         });
-        // N.b. was unsure whether to go with 404 or 200 for this text and next
-        test("GET 404: no results after filtering (but author / topic does exist", () => {
+        test.only("GET 200: no results after filtering (but author exists)", () => {
           return request(app)
             .get("/api/articles?author=lurker")
-            .expect(404)
-            .then(({ body: { msg } }) => {
-              expect(msg).toBe("No articles found!");
+            .expect(200)
+            .then(({ body: { articles } }) => {
+              expect(articles).toEqual([]);
             });
         });
-        test("GET 404: no results after filtering (and author / topic does not exist)", () => {
+        test.only("GET 200: no results after filtering (but topic exists)", () => {
+          return request(app)
+            .get("/api/articles?topic=paper")
+            .expect(200)
+            .then(({ body: { topics } }) => {
+              expect(articles).toEqual([]);
+            });
+        });
+        test.only("GET 404: no results after filtering (and topic does not exist)", () => {
           return request(app)
             .get("/api/articles?topic=badger")
             .expect(404)
             .then(({ body: { msg } }) => {
-              expect(msg).toBe("No articles found!");
+              expect(msg).toBe("Topic not found!");
+            });
+        });
+        test.only("GET 404: no results after filtering (and author does not exist)", () => {
+          return request(app)
+            .get("/api/articles?author=bannana")
+            .expect(404)
+            .then(({ body: { msg } }) => {
+              expect(msg).toBe("Author not found!");
             });
         });
       });
