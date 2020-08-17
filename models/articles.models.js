@@ -21,9 +21,6 @@ exports.selectArticles = (
         if (topic) query.where("articles.topic", "=", topic);
       })
       .then((articles) => {
-        if (articles.length === 0) {
-          return Promise.reject({ status: 404, msg: "No articles found!" });
-        } else
           return articles.map((article) => {
             article.comment_count = parseInt(article.comment_count, 10);
             return article;

@@ -4,13 +4,20 @@ const {
   updateArticleById,
 } = require("../models/articles.models");
 
+const { selectUserByUsername } = require("../models/users.models");
+
 exports.getArticles = (req, res, next) => {
   const { sort_by, order, author, topic } = req.query;
-  selectArticles(sort_by, order, author, topic)
-    .then((articles) => {
-      res.status(200).send({ articles });
-    })
-    .catch(next);
+  if (author) {
+    selectUserByUsername(author)
+      .then(() => {
+        return selectArticles(sort_by, order, author, topic);
+      })
+      .then((articles) => {
+        res.status(200).send({ articles });
+      })
+      .catch(next);
+  }
 };
 
 exports.getArticleById = (req, res, next) => {
