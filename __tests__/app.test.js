@@ -17,8 +17,20 @@ describe("/", () => {
     });
   });
   describe("/api", () => {
+    test.only("GET 200: Responds with JSON representation of API", () => {
+      return request(app)
+        .get("/api")
+        .expect(200)
+        .then(({ body: { apiDescription } }) => {
+          expect(apiDescription).toEqual(
+            expect.objectContaining({
+              "GET /api": expect.any(Object),
+            })
+          );
+        });
+    });
     test("405: when request uses invalid method", () => {
-      const invalidMethods = ["get", "put", "post", "patch", "delete"];
+      const invalidMethods = ["put", "post", "patch", "delete"];
       const methodPromises = invalidMethods.map((method) => {
         return request(app)
           [method]("/api")
@@ -29,118 +41,6 @@ describe("/", () => {
       });
       return Promise.all(methodPromises);
     });
-    describe("/topics", () => {
-      describe("GET", () => {
-        test("GET 200: responds with an array of topic objects", () => {
-          return request(app)
-            .get("/api/topics")
-            .expect(200)
-            .then(({ body: { topics } }) => {
-              topics.forEach((topic) => {
-                expect(topic).toEqual(
-                  expect.objectContaining({
-                    description: expect.any(String),
-                    slug: expect.any(String),
-                  })
-                );
-              });
-            });
-        });
-      });
-      describe("INVALID METHODS", () => {
-        test("405: when request uses invalid method", () => {
-          const invalidMethods = ["patch", "put", "post", "delete"];
-          const methodPromises = invalidMethods.map((method) => {
-            return request(app)
-              [method]("/api/topics")
-              .expect(405)
-              .then(({ body: { msg } }) => {
-                expect(msg).toBe("Method not allowed!");
-              });
-          });
-          return Promise.all(methodPromises);
-        });
-      });
-      describe("/:slug", () => {
-        describe("GET", () => {
-          test("GET 200: responds with a topic object", () => {
-            return request(app)
-              .get("/api/topics/mitch")
-              .expect(200)
-              .then(({ body: { topic } }) => {
-                expect(topic).toEqual({
-                  description: "The man, the Mitch, the legend",
-                  slug: "mitch",
-                });
-              });
-          });
-          test("GET 404: topic not found", () => {
-            return request(app)
-              .get("/api/topics/notATopic")
-              .expect(404)
-              .then(({ body: { msg } }) => {
-                expect(msg).toBe("Topic not found!");
-              });
-          });
-        });
-        describe("INVALID METHODS", () => {
-          test("405: when request uses invalid method", () => {
-            const invalidMethods = ["put", "post", "patch", "delete"];
-            const methodPromises = invalidMethods.map((method) => {
-              return request(app)
-                [method]("/api/topics/mitch")
-                .expect(405)
-                .then(({ body: { msg } }) => {
-                  expect(msg).toBe("Method not allowed!");
-                });
-            });
-            return Promise.all(methodPromises);
-          });
-        });
-      });
-    });
-    describe("/users", () => {
-      describe("/:username", () => {
-        describe("GET", () => {
-          test("GET 200: responds with a user object", () => {
-            return request(app)
-              .get("/api/users/rogersop")
-              .expect(200)
-              .then(({ body: { user } }) => {
-                expect(user).toEqual(
-                  expect.objectContaining({
-                    username: expect.any(String),
-                    avatar_url: expect.any(String),
-                    name: expect.any(String),
-                  })
-                );
-              });
-          });
-          test("GET 404: username not found", () => {
-            return request(app)
-              .get("/api/users/notauser")
-              .expect(404)
-              .then(({ body: { msg } }) => {
-                expect(msg).toBe("User not found!");
-              });
-          });
-        });
-        describe("INVALID METHODS", () => {
-          test("405: when request uses invalid method", () => {
-            const invalidMethods = ["patch", "put", "post", "delete"];
-            const methodPromises = invalidMethods.map((method) => {
-              return request(app)
-                [method]("/api/users/rogersop")
-                .expect(405)
-                .then(({ body: { msg } }) => {
-                  expect(msg).toBe("Method not allowed!");
-                });
-            });
-            return Promise.all(methodPromises);
-          });
-        });
-      });
-    });
     describe("/articles", () => {
       describe("GET", () => {
         test("GET 200: responds with an array of article objects, default sort", () => {
@@ -149,7 +49,9 @@ describe("/", () => {
             .expect(200)
             .then(({ body: { articles } }) => {
               expect(articles.length).toBe(12);
-              expect(articles).toBeSortedBy("created_at", { descending: true });
+              expect(articles).toBeSortedBy("created_at", {
+                descending: true,
+              });
               articles.forEach((article) => {
                 expect(article).toEqual(
                   expect.objectContaining({
@@ -172,7 +74,9 @@ describe("/", () => {
               .expect(200)
               .then(({ body: { articles } }) => {
                 expect(articles.length).toBe(12);
-                expect(articles).toBeSortedBy("author", { descending: true });
+                expect(articles).toBeSortedBy("author", {
+                  descending: true,
+                });
               });
           });
           test("GET 400: invalid sort order", () => {
@@ -189,7 +93,9 @@ describe("/", () => {
               .expect(200)
               .then(({ body: { articles } }) => {
                 expect(articles.length).toBe(12);
-                expect(articles).toBeSortedBy("title", { descending: false });
+                expect(articles).toBeSortedBy("title", {
+                  descending: false,
+                });
               });
           });
           test("GET 200: responds with default sort if invalid query", () => {
@@ -484,9 +390,11 @@ describe("/", () => {
                     expect(comment).toEqual(
                       expect.objectContaining({
                         comment_id: expect.any(Number),
+                        author: expect.any(String),
+                        article_id: expect.any(Number),
                         votes: expect.any(Number),
                         created_at: expect.any(String),
-                        author: expect.any(String),
+                        body: expect.any(String),
                       })
                     );
                   });
@@ -498,7 +406,9 @@ describe("/", () => {
                 .expect(200)
                 .then(({ body: { comments } }) => {
                   expect(comments.length).toBe(13);
-                  expect(comments).toBeSortedBy("author", { descending: true });
+                  expect(comments).toBeSortedBy("author", {
+                    descending: true,
+                  });
                 });
             });
             test("GET 400: invalid sort order", () => {
@@ -515,7 +425,9 @@ describe("/", () => {
                 .expect(200)
                 .then(({ body: { comments } }) => {
                   expect(comments.length).toBe(13);
-                  expect(comments).toBeSortedBy("votes", { descending: false });
+                  expect(comments).toBeSortedBy("votes", {
+                    descending: false,
+                  });
                 });
             });
             test("GET 200: responds with default sort if invalid query", () => {
@@ -782,6 +694,118 @@ describe("/", () => {
             const methodPromises = invalidMethods.map((method) => {
               return request(app)
                 [method]("/api/comments/1")
+                .expect(405)
+                .then(({ body: { msg } }) => {
+                  expect(msg).toBe("Method not allowed!");
+                });
+            });
+            return Promise.all(methodPromises);
+          });
+        });
+      });
+    });
+    describe("/topics", () => {
+      describe("GET", () => {
+        test("GET 200: responds with an array of topic objects", () => {
+          return request(app)
+            .get("/api/topics")
+            .expect(200)
+            .then(({ body: { topics } }) => {
+              topics.forEach((topic) => {
+                expect(topic).toEqual(
+                  expect.objectContaining({
+                    description: expect.any(String),
+                    slug: expect.any(String),
+                  })
+                );
+              });
+            });
+        });
+      });
+      describe("INVALID METHODS", () => {
+        test("405: when request uses invalid method", () => {
+          const invalidMethods = ["patch", "put", "post", "delete"];
+          const methodPromises = invalidMethods.map((method) => {
+            return request(app)
+              [method]("/api/topics")
+              .expect(405)
+              .then(({ body: { msg } }) => {
+                expect(msg).toBe("Method not allowed!");
+              });
+          });
+          return Promise.all(methodPromises);
+        });
+      });
+      describe("/:slug", () => {
+        describe("GET", () => {
+          test("GET 200: responds with a topic object", () => {
+            return request(app)
+              .get("/api/topics/mitch")
+              .expect(200)
+              .then(({ body: { topic } }) => {
+                expect(topic).toEqual({
+                  description: "The man, the Mitch, the legend",
+                  slug: "mitch",
+                });
+              });
+          });
+          test("GET 404: topic not found", () => {
+            return request(app)
+              .get("/api/topics/notATopic")
+              .expect(404)
+              .then(({ body: { msg } }) => {
+                expect(msg).toBe("Topic not found!");
+              });
+          });
+        });
+        describe("INVALID METHODS", () => {
+          test("405: when request uses invalid method", () => {
+            const invalidMethods = ["put", "post", "patch", "delete"];
+            const methodPromises = invalidMethods.map((method) => {
+              return request(app)
+                [method]("/api/topics/mitch")
+                .expect(405)
+                .then(({ body: { msg } }) => {
+                  expect(msg).toBe("Method not allowed!");
+                });
+            });
+            return Promise.all(methodPromises);
+          });
+        });
+      });
+    });
+    describe("/users", () => {
+      describe("/:username", () => {
+        describe("GET", () => {
+          test("GET 200: responds with a user object", () => {
+            return request(app)
+              .get("/api/users/rogersop")
+              .expect(200)
+              .then(({ body: { user } }) => {
+                expect(user).toEqual(
+                  expect.objectContaining({
+                    username: expect.any(String),
+                    avatar_url: expect.any(String),
+                    name: expect.any(String),
+                  })
+                );
+              });
+          });
+          test("GET 404: username not found", () => {
+            return request(app)
+              .get("/api/users/notauser")
+              .expect(404)
+              .then(({ body: { msg } }) => {
+                expect(msg).toBe("User not found!");
+              });
+          });
+        });
+        describe("INVALID METHODS", () => {
+          test("405: when request uses invalid method", () => {
+            const invalidMethods = ["patch", "put", "post", "delete"];
+            const methodPromises = invalidMethods.map((method) => {
+              return request(app)
+                [method]("/api/users/rogersop")
                 .expect(405)
                 .then(({ body: { msg } }) => {
                   expect(msg).toBe("Method not allowed!");

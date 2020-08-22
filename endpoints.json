@@ -2,26 +2,135 @@
   "GET /api": {
     "description": "serves up a json representation of all the available endpoints of the api"
   },
-  "GET /api/topics": {
-    "description": "serves an array of all topics",
-    "queries": [],
-    "exampleResponse": {
-      "topics": [{ "slug": "football", "description": "Footie!" }]
-    }
-  },
   "GET /api/articles": {
-    "description": "serves an array of all topics",
+    "description": "serves an array of all articles",
     "queries": ["author", "topic", "sort_by", "order"],
     "exampleResponse": {
       "articles": [
         {
+          "article_id": 41,
           "title": "Seafood substitutions are increasing",
+          "body": "Text from the article...",
+          "votes": 100,
           "topic": "cooking",
           "author": "weegembump",
-          "body": "Text from the article..",
-          "created_at": 1527695953341
+          "created_at": "2018-11-15T12:21:54.171Z",
+          "comment_count": 3
         }
       ]
+    }
+  },
+  "GET /api/articles/:article_id": {
+    "description": "serves a particular article by its id",
+    "exampleResponse": {
+      "article": {
+        "article_id": 1,
+        "title": "Badgers",
+        "body": "Text from the article..",
+        "votes": 90,
+        "topic": "Nocturnal animals",
+        "author": "weegembump",
+        "created_at": "2018-11-15T12:21:54.171Z"
+      }
+    }
+  },
+  "PATCH /api/articles/:article_id": {
+    "description": "updates a particular article, responds with the updated article",
+    "exampleBody": { "inc_votes": 10 },
+    "exampleResponse": {
+      "article": {
+        "article_id": 1,
+        "title": "Badgers",
+        "body": "Text from the article..",
+        "votes": 100,
+        "topic": "Nocturnal animals",
+        "author": "weegembump",
+        "created_at": "2018-11-15T12:21:54.171Z"
+      }
+    }
+  },
+  "GET /api/articles/:article_id/comments": {
+    "description": "serves an array of comments for a particular article",
+    "queries": ["sort_by", "order"],
+    "exampleResponse": {
+      "comments": [
+        {
+          "comment_id": 1,
+          "author": "butter_bridge",
+          "article_id": 9,
+          "votes": 16,
+          "created_at": "2017-11-22T12:36:03.389Z",
+          "body": "Text from the comment"
+        }
+      ]
+    }
+  },
+  "POST /api/articles/:article_id/comments": {
+    "description": "adds a comment to a particular article, responds with the added comment",
+    "exampleBody": { "username": "butter_bridge", "body": "a new comment" },
+    "exampleResponse": {
+      "comments": [
+        {
+          "comment_id": 19,
+          "author": "butter_bridge",
+          "article_id": 1,
+          "votes": 0,
+          "created_at": "2018-10-21T11:32:01.234Z",
+          "body": "a new comment"
+        }
+      ]
+    }
+  },
+  "GET /api/comments/:comment_id": {
+    "description": "serves a particular comment by its id",
+    "exampleResponse": {
+      "comment": {
+        "comment_id": 1,
+        "body": "Text from the comment...",
+        "article_id": 9,
+        "author": "butter_bridge",
+        "votes": 16,
+        "created_at": "2017-11-22T12:36:03.389Z"
+      }
+    }
+  },
+  "PATCH /api/comments/:comment_id": {
+    "description": "updates a particular comment, responds with the updated comment",
+    "exampleBody": { "inc_votes": 1 },
+    "exampleResponse": {
+      "comment": {
+        "comment_id": 1,
+        "body": "Text from the comment...",
+        "article_id": 9,
+        "author": "butter_bridge",
+        "votes": 17,
+        "created_at": "2017-11-22T12:36:03.389Z"
+      }
+    }
+  },
+  "DELETE /api/comments/:comment_id": {
+    "description": "deletes a particular comment, no response"
+  },
+  "GET /api/topics": {
+    "description": "serves an array of all topics",
+    "exampleResponse": {
+      "topics": [{ "slug": "football", "description": "Footie!" }]
+    }
+  },
+  "GET /api/topics/:slug": {
+    "description": "serves a particular topic by its topic slug",
+    "exampleResponse": {
+      "topic": { "slug": "football", "description": "Footie!" }
+    }
+  },
+  "GET /api/users/:username": {
+    "description": "serves a particular user by their username",
+    "exampleResponse": {
+      "topic": {
+        "username": "stephenbradshaw",
+        "avatar_url": "<url>",
+        "name": "stephen"
+      }
     }
   }
 }
