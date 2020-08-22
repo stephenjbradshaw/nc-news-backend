@@ -6,14 +6,29 @@ describe("/", () => {
   beforeEach(() => knex.seed.run());
   afterAll(() => knex.destroy());
   test("ALL 404: Route does not exist", () => {
-    return request(app)
-      .get("/notARoute")
-      .expect(404)
-      .then(({ body: { msg } }) => {
-        expect(msg).toBe("Route not found!");
-      });
+    const methodsToCheck = ["get", "put", "post", "patch", "delete"];
+    const methodPromises = methodsToCheck.map((method) => {
+      return request(app)
+        [method]("/notARoute")
+        .expect(404)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Route not found!");
+        });
+    });
   });
   describe("/api", () => {
+    test("405: when request uses invalid method", () => {
+      const invalidMethods = ["get", "put", "post", "patch", "delete"];
+      const methodPromises = invalidMethods.map((method) => {
+        return request(app)
+          [method]("/api")
+          .expect(405)
+          .then(({ body: { msg } }) => {
+            expect(msg).toBe("Method not allowed!");
+          });
+      });
+      return Promise.all(methodPromises);
+    });
     describe("/topics", () => {
       describe("GET", () => {
         test("GET 200: responds with an array of topic objects", () => {
@@ -150,7 +165,6 @@ describe("/", () => {
               });
             });
         });
-
         describe("Sort queries", () => {
           test("GET 200: custom sort column, defaults to descending if order not specified", () => {
             return request(app)
@@ -198,7 +212,6 @@ describe("/", () => {
               });
           });
         });
-
         describe("Filter queries", () => {
           test("GET 200: can filter by author where the author exists", () => {
             return request(app)
