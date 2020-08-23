@@ -17,7 +17,7 @@ describe("/", () => {
     });
   });
   describe("/api", () => {
-    test.only("GET 200: Responds with JSON representation of API", () => {
+    test("GET 200: Responds with JSON representation of API", () => {
       return request(app)
         .get("/api")
         .expect(200)
