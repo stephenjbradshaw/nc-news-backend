@@ -19,11 +19,11 @@ exports.handleCustomErrors = (err, req, res, next) => {
   } else next(err);
 };
 
-exports.handle500s = (err, req, res, next) => {
+exports.handle500s = (err, req, res) => {
   res.sendStatus(500);
 };
 
 // Controllers
-exports.handle405s = (req, res, next) => {
+exports.handle405s = (req, res) => {
   res.status(405).send({ msg: "Method not allowed!" });
 };
