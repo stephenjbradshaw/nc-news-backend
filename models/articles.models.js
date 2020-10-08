@@ -21,10 +21,10 @@ exports.selectArticles = (
         if (topic) query.where("articles.topic", "=", topic);
       })
       .then((articles) => {
-          return articles.map((article) => {
-            article.comment_count = parseInt(article.comment_count, 10);
-            return article;
-          });
+        return articles.map((article) => {
+          article.comment_count = parseInt(article.comment_count, 10);
+          return article;
+        });
       });
   }
 };
@@ -57,7 +57,7 @@ exports.updateArticleById = (article_id, inc_votes = 0) => {
       if (result.length === 0) {
         return Promise.reject({ status: 404, msg: "Article not found!" });
       } else {
-        [updatedArticle] = result;
+        const [updatedArticle] = result;
         return updatedArticle;
       }
     });
