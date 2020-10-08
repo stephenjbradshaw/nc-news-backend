@@ -15,6 +15,7 @@ describe("/", () => {
           expect(msg).toBe("Route not found!");
         });
     });
+    return Promise.all(methodPromises);
   });
   describe("/api", () => {
     test("GET 200: Responds with JSON representation of API", () => {
