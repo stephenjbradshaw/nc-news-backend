@@ -10,6 +10,8 @@
     "seed-test": "NODE_ENV=test knex seed:run",
     "seed:prod": "NODE_ENV=production DB_URL=$(heroku config:get DATABASE_URL) knex seed:run",
     "test": "jest --watch",
+    "test-no-watch": "jest",
+    "lint": "eslint --fix .",
     "migrate-make": "knex migrate:make",
     "migrate-latest": "knex migrate:latest",
     "migrate-rollback": "knex migrate:rollback",
@@ -47,5 +49,10 @@
     "setupFilesAfterEnv": [
       "jest-sorted"
     ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run test-no-watch && npm run lint && pretty-quick --staged"
+    }
   }
 }
