@@ -1,6 +1,6 @@
-# Northcoders News (Backend)
+# Northcoders News (Back End)
 
-Northcoders News is a full-stack reddit-style messaging board, built as part of the full-time intensive coding bootcamp at [Northcoders](https://www.northcoders.com/). This is the back end for the site, a RESTful API built using Node.js, Express, Knex.js, and PostgreSQL, with testing carried out using Jest. Users can view articles posted to the site, add and remove comments, and vote on articles and comments.
+Northcoders News is a full-stack Reddit-style messaging board, built as part of the full-time intensive coding bootcamp at [Northcoders](https://www.northcoders.com/). This is the back end for the site, a RESTful API built using Node.js, Express, Knex.js, and PostgreSQL, with testing carried out using Jest. Users can view articles posted to the site, add and remove comments, and vote on articles and comments.
 
 - View the [hosted API](https://sb-nc-news-backend.herokuapp.com/api)
 
