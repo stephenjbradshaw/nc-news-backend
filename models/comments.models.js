@@ -33,7 +33,7 @@ exports.insertCommentByArticleId = (article_id, author, body) => {
     .insert({ article_id: article_id, author: author, body: body })
     .returning("*")
     .then((result) => {
-      [newComment] = result;
+      const [newComment] = result;
       return newComment;
     });
 };
@@ -46,8 +46,8 @@ exports.selectCommentById = (comment_id) => {
       if (result.length === 0) {
         return Promise.reject({ status: 404, msg: "Comment not found!" });
       } else {
-        [Comment] = result;
-        return Comment;
+        const [comment] = result;
+        return comment;
       }
     });
 };
@@ -61,7 +61,7 @@ exports.updateCommentById = (comment_id, inc_votes = 0) => {
       if (result.length === 0) {
         return Promise.reject({ status: 404, msg: "Comment not found!" });
       } else {
-        [updatedComment] = result;
+        const [updatedComment] = result;
         return updatedComment;
       }
     });

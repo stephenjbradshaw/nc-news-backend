@@ -467,7 +467,7 @@ describe("formatComments", () => {
         created_at: 975242163389,
       },
     ];
-    const formattedComments = formatComments(comments, lookup);
+    formatComments(comments, lookup);
     expect(comments).toEqual([
       {
         body: "This is a bad article name",
